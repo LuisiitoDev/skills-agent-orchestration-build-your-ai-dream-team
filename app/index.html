@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Project Pulse</title>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <header class="site-header">
+      <h1>Project Pulse</h1>
+      <p>Track the work moving our contributor community forward.</p>
+    </header>
+
+    <main class="dashboard" aria-labelledby="dashboard-heading">
+      <section aria-labelledby="dashboard-heading">
+        <h2 id="dashboard-heading">Active projects</h2>
+        <p id="dashboard-description">Current ownership, progress, and recent activity.</p>
+        <div
+          id="project-content"
+          class="project-grid"
+          aria-busy="true"
+          aria-describedby="dashboard-description"
+        >
+          <p class="loading-state" role="status">Loading project updates…</p>
+        </div>
+      </section>
+    </main>
+
+    <script>
+      (() => {
+        const content = document.querySelector("#project-content");
+        const requiredFields = ["name", "owner", "status", "recentActivity", "priority"];
+
+        function createTextElement(tagName, className, text) {
+          const element = document.createElement(tagName);
+          element.className = className;
+          element.textContent = text;
+          return element;
+        }
+
+        function showState(className, message) {
+          content.replaceChildren(createTextElement("p", className, message));
+          content.setAttribute("aria-busy", "false");
+        }
+
+        function isValidProject(project) {
+          return project !== null
+            && typeof project === "object"
+            && requiredFields.every((field) => typeof project[field] === "string"
+              && project[field].trim().length > 0);
+        }
+
+        function createProjectCard(project) {
+          const card = document.createElement("article");
+          card.className = "project-card";
+
+          const heading = createTextElement("h3", "project-name", project.name);
+          const owner = createTextElement("p", "project-owner", `Owner: ${project.owner}`);
+          const metadata = document.createElement("dl");
+          metadata.className = "project-meta";
+
+          const statusTerm = createTextElement("dt", "visually-hidden", "Status");
+          const status = createTextElement("dd", "status-badge", project.status);
+          const priorityTerm = createTextElement("dt", "visually-hidden", "Priority");
+          const priority = createTextElement("dd", "priority", `Priority: ${project.priority}`);
+          metadata.append(statusTerm, status, priorityTerm, priority);
+
+          if (typeof project.summary === "string" && project.summary.trim()) {
+            card.append(createTextElement("p", "project-summary", project.summary));
+          }
+
+          const activityHeading = createTextElement("h4", "activity-heading", "Recent activity");
+          const activity = createTextElement("p", "recent-activity", project.recentActivity);
+          card.prepend(heading, owner, metadata);
+          card.append(activityHeading, activity);
+          return card;
+        }
+
+        async function loadProjects() {
+          try {
+            const response = await fetch("project-data.json");
+            if (!response.ok) {
+              throw new Error(`Request failed with status ${response.status}`);
+            }
+
+            const data = await response.json();
+            if (!data || !Array.isArray(data.projects)) {
+              throw new Error("The project data is missing its projects list.");
+            }
+            if (!data.projects.every(isValidProject)) {
+              throw new Error("The project data contains an incomplete project.");
+            }
+            if (data.projects.length === 0) {
+              showState("empty-state", "No projects are available right now. Check back soon.");
+              return;
+            }
+
+            content.replaceChildren(...data.projects.map(createProjectCard));
+            content.setAttribute("aria-busy", "false");
+          } catch (error) {
+            console.error("Unable to load Project Pulse data:", error);
+            showState(
+              "error-state",
+              "Project updates could not be loaded. Please refresh the page or try again later."
+            );
+          }
+        }
+
+        loadProjects();
+      })();
+    </script>
+  </body>
+</html>

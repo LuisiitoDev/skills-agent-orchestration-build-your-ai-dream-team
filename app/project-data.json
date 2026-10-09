@@ -1,0 +1,36 @@
+{
+  "projects": [
+    {
+      "name": "Contributor Onboarding",
+      "owner": "Maya Chen",
+      "status": "On track",
+      "recentActivity": "Updated the first-contribution guide and paired two new contributors.",
+      "priority": "High",
+      "summary": "Make the first contribution clear, welcoming, and quick to complete."
+    },
+    {
+      "name": "Accessibility Audit",
+      "owner": "Jordan Williams",
+      "status": "At risk",
+      "recentActivity": "Keyboard testing found two blocking focus-order issues.",
+      "priority": "High",
+      "summary": "Resolve critical navigation barriers before the next community release."
+    },
+    {
+      "name": "Documentation Refresh",
+      "owner": "Priya Nair",
+      "status": "In progress",
+      "recentActivity": "Published revised setup examples for the latest toolchain.",
+      "priority": "Medium",
+      "summary": "Keep contributor documentation accurate, concise, and easy to scan."
+    },
+    {
+      "name": "Community Showcase",
+      "owner": "Luis Romero",
+      "status": "Planned",
+      "recentActivity": "Collected project nominations from the monthly community call.",
+      "priority": "Low",
+      "summary": "Highlight meaningful community work in the next project showcase."
+    }
+  ]
+}
